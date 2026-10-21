@@ -12,21 +12,24 @@ spec:
       labels:
         app: log-output
     spec:
+      nodeName: k3d-k3s-default-server-0
+
       volumes:
-        - name: shared-log
-          emptyDir: {}
+        - name: shared-data
+          persistentVolumeClaim:
+            claimName: shared-data-claim
 
       containers:
         - name: log-writer
-          image: log-output:1.10
+          image: log-output:1.11
           imagePullPolicy: Never
           command: ["python", "writer.py"]
           volumeMounts:
-            - name: shared-log
-              mountPath: /usr/src/app/files
+            - name: shared-data
+              mountPath: /shared
 
         - name: log-reader
-          image: log-output:1.10
+          image: log-output:1.11
           imagePullPolicy: Never
           command: ["python", "server.py"]
           env:
@@ -36,5 +39,5 @@ spec:
             - name: http
               containerPort: 3000
           volumeMounts:
-            - name: shared-log
-              mountPath: /usr/src/app/files
+            - name: shared-data
+              mountPath: /shared

@@ -3,7 +3,7 @@ import string
 import time
 from datetime import datetime, timezone
 
-OUTPUT_FILE = "/usr/src/app/files/output.txt"
+OUTPUT_FILE = "/shared/log-output.txt"
 
 random_string = "".join(
     random.choices(string.ascii_letters + string.digits, k=36)
