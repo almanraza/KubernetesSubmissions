@@ -2,10 +2,14 @@ FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-COPY app.js .
+COPY package.json ./
+COPY app.js ./
+
+RUN mkdir -p /mnt/cache
 
 ENV PORT=3000
+ENV IMAGE_CACHE_DIRECTORY=/mnt/cache
 
 EXPOSE 3000
 
-CMD ["node", "app.js"]
+CMD ["npm", "start"]

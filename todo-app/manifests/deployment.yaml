@@ -4,21 +4,51 @@ metadata:
   name: todo-app
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       app: todo-app
+
   template:
     metadata:
       labels:
         app: todo-app
+
     spec:
       containers:
         - name: todo-app
-          image: todo-app:1.5
-          imagePullPolicy: Never
+          image: todo-app:1.12
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 3000
+
           env:
             - name: PORT
               value: "3000"
-          ports:
-            - name: http
-              containerPort: 3000
+
+            - name: IMAGE_CACHE_DIRECTORY
+              value: /mnt/cache
+
+          volumeMounts:
+            - name: image-cache
+              mountPath: /mnt/cache
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 2
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+      volumes:
+        - name: image-cache
+          persistentVolumeClaim:
+            claimName: todo-image-pvc
