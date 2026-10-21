@@ -12,7 +12,29 @@ spec:
       labels:
         app: log-output
     spec:
+      volumes:
+        - name: shared-log
+          emptyDir: {}
+
       containers:
-        - name: log-output
-          image: log-output:1.3
+        - name: log-writer
+          image: log-output:1.10
           imagePullPolicy: Never
+          command: ["python", "writer.py"]
+          volumeMounts:
+            - name: shared-log
+              mountPath: /usr/src/app/files
+
+        - name: log-reader
+          image: log-output:1.10
+          imagePullPolicy: Never
+          command: ["python", "server.py"]
+          env:
+            - name: PORT
+              value: "3000"
+          ports:
+            - name: http
+              containerPort: 3000
+          volumeMounts:
+            - name: shared-log
+              mountPath: /usr/src/app/files
